@@ -33,8 +33,9 @@ protected:
     afx_msg HCURSOR OnQueryDragIcon();
     DECLARE_MESSAGE_MAP()
 
-    BOOL CloseExWindows(CString);
+    BOOL CloseExWindows(CString windowToClose);
     void FillTheComboBox(CComboBox *cb);
+    BOOL ComboBoxContains(CComboBox *cb, CString windowToClose);
     void RemoveDuplicates(CStringList &lst);
     bool GetProductAndVersion(CStringA & strProductVersion);
 
@@ -44,6 +45,7 @@ public:
     afx_msg void OnCbnSelchangeComboAllWindows();
     afx_msg void OnNMClickSyslinkGithub(NMHDR *pNMHDR, LRESULT *pResult);
     BOOL PreTranslateMessage(MSG * pMsg);
+    CString      m_AppName;
 
 protected:
     CEdit        m_EditWindowTitleToClose;

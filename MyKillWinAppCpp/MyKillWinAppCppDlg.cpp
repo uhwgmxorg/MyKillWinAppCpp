@@ -4,14 +4,20 @@
 
 #include "stdafx.h"
 
+#include "resource.h"
+
 #include "MyKillWinAppCpp.h"
 #include "MyKillWinAppCppDlg.h"
 #include "afxdialogex.h"
 #include <vector>
 
+#include "SplitPath.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
+
+#define PROGRAM_MANAGER L"Program Manager"
 
 //------------------------------/
 //-     Global functions       -/
@@ -104,6 +110,7 @@ END_MESSAGE_MAP()
 
 BOOL CMyKillWinAppCppDlg::OnInitDialog()
 {
+    CString strHelp;
     CDialogEx::OnInitDialog();
 
     // Set the icon for this dialog.  The framework does this automatically
@@ -115,23 +122,33 @@ BOOL CMyKillWinAppCppDlg::OnInitDialog()
     FillTheComboBox(&m_CBWindowList);
 
     // init the ToolTips
+    strHelp.LoadString(IDS_STRING_TT_TBCTW);
     m_ButtonCloseExternWindowToolTip.Create(this);
-    m_ButtonCloseExternWindowToolTip.AddTool(&m_ButtonCloseExternWindow, L"This button closes the window containing the text in the TextBox to the left of the button (in the CEdit). \nBe careful, the desktop window may also be listed, if you close it the screen will get dark and you have to log \noff with Ctr-Alt-Del and log on again.");
+    m_ButtonCloseExternWindowToolTip.AddTool(&m_ButtonCloseExternWindow, strHelp);
     m_ButtonCloseExternWindowToolTip.SetMaxTipWidth(SHRT_MAX);               // this is required for line breaks in the ToolTip
     m_ButtonCloseExternWindowToolTip.SetDelayTime(TTDT_AUTOPOP,30 * 1000);   // this sets the time how long the ToolTip is displayed
     m_ButtonCloseExternWindowToolTip.Activate(TRUE);
 
+    strHelp.LoadString(IDS_STRING_TT_RTWL);
     m_ButtonReloadToolTip.Create(this);
-    m_ButtonReloadToolTip.AddTool(&m_ButtonReload, L"Reload the window list");
+    m_ButtonReloadToolTip.AddTool(&m_ButtonReload, strHelp);
     m_ButtonReloadToolTip.Activate(TRUE);
 
+    strHelp.LoadString(IDS_STRING_TT_TITWT);
     m_TextBoxWindowTitleToCloseToolTip.Create(this);
-    m_TextBoxWindowTitleToCloseToolTip.AddTool(&m_EditWindowTitleToClose, L"This is the window that is closed");
+    m_TextBoxWindowTitleToCloseToolTip.AddTool(&m_EditWindowTitleToClose, strHelp);
     m_TextBoxWindowTitleToCloseToolTip.Activate(TRUE);
 
+    strHelp.LoadString(IDS_STRING_TT_LOAWC);
     m_CBWindowListToolTip.Create(this);
-    m_CBWindowListToolTip.AddTool(&m_CBWindowList, L"List of all window candidates that can be closed");
+    m_CBWindowListToolTip.AddTool(&m_CBWindowList, strHelp);
     m_CBWindowListToolTip.Activate(TRUE);
+
+    // Get .exe name
+    TCHAR szExeFileName[MAX_PATH];
+    GetModuleFileName(NULL, szExeFileName, MAX_PATH);
+    CSplitPath sp(szExeFileName);
+    m_AppName = sp.GetFileName();
 
 	// get the windows title
     LPTSTR szWinText = new TCHAR[1024];
@@ -196,6 +213,26 @@ HCURSOR CMyKillWinAppCppDlg::OnQueryDragIcon()
 
 void CMyKillWinAppCppDlg::OnBnClickedButtonCloseExternWindow()
 {
+    CString strHelp;
+    CString strMessage;
+
+    UpdateData(true);
+
+    // Error checking
+    if (!ComboBoxContains(&m_CBWindowList, m_WindowTitleToClose))
+    {
+        strMessage.LoadString(IDS_STRING_NOT_WNA);
+        strHelp.Format(strMessage,m_WindowTitleToClose);
+        MessageBox(strHelp, m_AppName, MB_OK | MB_ICONASTERISK);
+        return;
+    }
+    if (m_WindowTitleToClose.Find(PROGRAM_MANAGER) != -1)
+    {
+        strMessage.LoadString(IDS_STRING_WARNING_PMANAGER);
+        if(MessageBox(strMessage, m_AppName, MB_YESNO | MB_DEFBUTTON2 | MB_ICONWARNING) == IDNO)
+            return;
+    }
+
     while(CloseExWindows(m_WindowTitleToClose));
     FillTheComboBox(&m_CBWindowList);
 }
@@ -235,7 +272,7 @@ void CMyKillWinAppCppDlg::OnNMClickSyslinkGithub(NMHDR *pNMHDR, LRESULT *pResult
 
     PNMLINK pNMLink = (PNMLINK)pNMHDR;
 
-    ShellExecuteW(NULL, L"open", L"https://uhwgmxorg.wordpress.com/", NULL, NULL, SW_SHOWNORMAL);
+    ShellExecuteW(NULL, L"open", L"https://github.com/uhwgmxorg/MyKillWinAppCpp", NULL, NULL, SW_SHOWNORMAL);
 
     *pResult = 0;
 }
@@ -297,6 +334,14 @@ void CMyKillWinAppCppDlg::FillTheComboBox(CComboBox *cb)
     cb->SetCurSel(0);
     m_CBWindowList.GetLBText(m_CBWindowList.GetCurSel(), m_WindowTitleToClose);  // set the current selected item in to the CEdit
     UpdateData(FALSE);
+}
+
+BOOL CMyKillWinAppCppDlg::ComboBoxContains(CComboBox *cb, CString windowToClose)
+{
+    if (cb->FindString(0, windowToClose) >= 0)
+        return true;
+    else
+        return false;
 }
 
 void CMyKillWinAppCppDlg::RemoveDuplicates(CStringList &lst)

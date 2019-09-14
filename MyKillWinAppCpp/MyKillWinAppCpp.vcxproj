@@ -186,6 +186,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SplitPath.h" />
     <ClInclude Include="MyKillWinAppCpp.h" />
     <ClInclude Include="MyKillWinAppCppDlg.h" />
     <ClInclude Include="Resource.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SplitPath.cpp" />
     <ClCompile Include="MyKillWinAppCpp.cpp" />
     <ClCompile Include="MyKillWinAppCppDlg.cpp" />
     <ClCompile Include="stdafx.cpp">

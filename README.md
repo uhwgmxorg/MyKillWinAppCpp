@@ -1,2 +1,2 @@
 # MyKillWinAppCpp
-is an MFC C++ application that stores all windows on the desktop through iteration and into a ComboBox. If you select an entry from the ComboBox, it will be loaded into the Edit field, so you can edit it if you want and end the application.
+is an MFC C++ application that stores all windows on the desktop through iteration and into a ComboBox. If you select an entry from the ComboBox, it will be loaded into the Edit field, so you can edit it if you want and end the application. 
